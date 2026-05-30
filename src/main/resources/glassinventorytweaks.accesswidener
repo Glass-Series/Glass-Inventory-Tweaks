@@ -1,0 +1,6 @@
+accessWidener v2 named
+
+transitive-accessible field net/minecraft/screen/slot/Slot inventory Lnet/minecraft/inventory/Inventory;
+transitive-accessible field net/minecraft/screen/slot/Slot index I
+
+transitive-accessible method net/minecraft/client/gui/screen/ingame/HandledScreen getSlotAt (II)Lnet/minecraft/screen/slot/Slot;

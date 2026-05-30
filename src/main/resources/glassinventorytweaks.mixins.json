@@ -1,14 +1,16 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "%s.mixin",
+  "package": "net.glasslauncher.mods.glassinventorytweaks.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ExampleMixin"
   ],
   "server": [
   ],
   "client": [
+    "CraftingInventoryMixin",
+    "HandledScreenMixin",
+    "InventoryScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
