@@ -31,6 +31,7 @@ public abstract class HandledScreenMixin extends Screen {
         if (button != 0 || !Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
             return;
         }
+
         if (ClickImpl.shiftClick(getSlotAt(mouseX, mouseY), (HandledScreen) (Object) this)) {
             ci.cancel();
         }

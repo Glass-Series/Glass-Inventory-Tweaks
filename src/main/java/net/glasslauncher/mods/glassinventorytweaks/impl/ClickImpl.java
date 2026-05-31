@@ -1,5 +1,7 @@
 package net.glasslauncher.mods.glassinventorytweaks.impl;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import net.glasslauncher.mods.glassinventorytweaks.api.ShiftClickTreatSeparately;
 import net.glasslauncher.mods.glassinventorytweaks.api.ShouldNotShiftClick;
 import net.glasslauncher.mods.glassinventorytweaks.events.init.ShiftClickItemEvent;
@@ -16,31 +18,78 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ClickImpl {
+    // Important when doing batshit huge move operations.
+    private static final Cache<HandledScreen, List<SlotData>> SLOT_CACHE = Caffeine.newBuilder().weakKeys().build();
 
     public static boolean shiftClick(Slot shiftClickedSlot, HandledScreen handledScreen) {
         if (shiftClickedSlot == null || shiftClickedSlot.getStack() == null) {
             return false;
         }
 
-        SlotData originalInv = null;
-
         Event event = new ShiftClickItemEvent<>(handledScreen, shiftClickedSlot);
         StationAPI.EVENT_BUS.post(event);
         if (shiftClickedSlot.getStack() == null) {
             return true; // Someone emptied the slot, off we go
         }
+
+        List<SlotData> slotGroups = getSlots(handledScreen);
+        SlotData originalInv = slotGroups.stream().filter(e -> e.slots.contains(shiftClickedSlot)).findFirst().orElseThrow();
         boolean stashedCursorStack = Minecraft.INSTANCE.player.inventory.getCursorStack() != null;
 
-        ItemStack stackToMove = shiftClickedSlot.getStack();
+        Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, shiftClickedSlot.id, 0, false, Minecraft.INSTANCE.player);
 
+        boolean result = shiftClickCursorStack(handledScreen, originalInv);
+
+        // Put the stack back
+        if (Minecraft.INSTANCE.player.inventory.getCursorStack() != null || stashedCursorStack) {
+            Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, shiftClickedSlot.id, 0, false, Minecraft.INSTANCE.player);
+        }
+        return result;
+    }
+
+    public static boolean shiftClickCursorStack(HandledScreen handledScreen, SlotData originalInv) {
+        ItemStack stackToMove = Minecraft.INSTANCE.player.inventory.getCursorStack();
+
+        if (handledScreen.handler.slots.isEmpty() || stackToMove == null) {
+            return false;
+        }
+
+        List<SlotData> slotGroups = getSlots(handledScreen);
+
+        for (SlotData group : slotGroups) {
+            if (group == originalInv) {
+                continue;
+            }
+
+            for (Slot potentialSlot : group.slots) {
+                if (potentialSlot.inventory.getClass().isAnnotationPresent(ShouldNotShiftClick.class) || potentialSlot.getClass().isAnnotationPresent(ShouldNotShiftClick.class)) {
+                    continue;
+                }
+                ItemStack mergeStack = potentialSlot.getStack();
+
+                if (potentialSlot.canInsert(stackToMove) && (mergeStack == null || (mergeStack.isItemEqual(stackToMove) && mergeStack.count < potentialSlot.getMaxItemCount() && mergeStack.count < mergeStack.getItem().getMaxCount()))) {
+
+                    Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, potentialSlot.id, 0, false, Minecraft.INSTANCE.player);
+
+                    if (Minecraft.INSTANCE.player.inventory.getCursorStack() == null) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public static List<SlotData> getSlots(HandledScreen handledScreen) {
+        return SLOT_CACHE.get(handledScreen, ClickImpl::_getSlots);
+    }
+
+    private static List<SlotData> _getSlots(HandledScreen handledScreen) {
         List<SlotData> slotGroups = new ArrayList<>();
         int inventoryDataIndex = 0;
         int nextSplitPointIndex = 0;
         Inventory lastInv = null;
 
-        if (handledScreen.handler.slots.isEmpty()) {
-            return true;
-        }
         //noinspection unchecked
         List<Slot> allSlots = handledScreen.handler.slots;
 
@@ -84,48 +133,10 @@ public class ClickImpl {
 
             slotGroups.get(inventoryDataIndex).slots.add(slot);
 
-            if (slot == shiftClickedSlot) {
-                originalInv = slotGroups.get(inventoryDataIndex);
-            }
-
             lastInv = currentInv;
         }
 
         slotGroups.sort(Comparator.comparingInt(e -> -e.priority));
-
-        Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, shiftClickedSlot.id, 0, false, Minecraft.INSTANCE.player);
-
-        for (SlotData group : slotGroups) {
-            if (originalInv != null && group == originalInv) {
-                continue;
-            }
-
-            for (Slot potentialSlot : group.slots) {
-                if (potentialSlot.inventory.getClass().isAnnotationPresent(ShouldNotShiftClick.class) || potentialSlot.getClass().isAnnotationPresent(ShouldNotShiftClick.class)) {
-                    continue;
-                }
-                ItemStack mergeStack = potentialSlot.getStack();
-
-                if (potentialSlot.canInsert(stackToMove) && (mergeStack == null || (mergeStack.isItemEqual(stackToMove) && mergeStack.count < shiftClickedSlot.getMaxItemCount() && mergeStack.count < mergeStack.getItem().getMaxCount()))) {
-
-                    Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, potentialSlot.id, 0, false, Minecraft.INSTANCE.player);
-
-                    if (Minecraft.INSTANCE.player.inventory.getCursorStack() == null) {
-                        if (stashedCursorStack) {
-                            Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, shiftClickedSlot.id, 0, false, Minecraft.INSTANCE.player);
-                        }
-                        return true;
-                    }
-                }
-            }
-        }
-        // Put the stack back
-        if (Minecraft.INSTANCE.player.inventory.getCursorStack() != null) {
-            Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, shiftClickedSlot.id, 0, false, Minecraft.INSTANCE.player);
-        }
-        else if (stashedCursorStack) {
-            Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, shiftClickedSlot.id, 0, false, Minecraft.INSTANCE.player);
-        }
-        return true;
+        return slotGroups;
     }
 }
