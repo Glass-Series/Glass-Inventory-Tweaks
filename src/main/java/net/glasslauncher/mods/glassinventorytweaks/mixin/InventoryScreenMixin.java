@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.Mixin;
         value = {
                 8, // armor/inventory
                 35,// inventory/hotbar
-                44 // hotbar/accessoryapi
+                46 // hotbar/accessoryapi
         },
         sectionPreference = {
                 0, // craftoutput
