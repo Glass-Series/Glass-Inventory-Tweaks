@@ -10,7 +10,6 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.slot.Slot;
 import net.modificationstation.stationapi.api.StationAPI;
-import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.Comparator;

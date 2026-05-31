@@ -8,6 +8,14 @@ import java.lang.annotation.RetentionPolicy;
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ShiftClickTreatSeparately {
+    /**
+     * If you want to further divide the inventory, you can specify slot indexes to split by.
+     */
     int[] value() default {-1};
+
+    /**
+     * This is an array of priorities relative to the inventory section index.
+     * Higher means it'll be shift+clicked first.
+     */
     int[] sectionPreference() default {};
 }

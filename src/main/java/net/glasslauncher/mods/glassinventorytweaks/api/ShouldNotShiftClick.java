@@ -6,7 +6,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotate an inventory with this (works with mixins!) to make sure an inventory is NEVER shift clicked into.
+ * Annotate an inventory/slot with this (works with mixins!) to make sure it's NEVER shift clicked into.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
