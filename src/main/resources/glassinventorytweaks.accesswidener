@@ -1,5 +1,7 @@
 accessWidener v2 named
 
+accessible field net/minecraft/client/Minecraft INSTANCE Lnet/minecraft/client/Minecraft;
+
 transitive-accessible field net/minecraft/screen/slot/Slot inventory Lnet/minecraft/inventory/Inventory;
 transitive-accessible field net/minecraft/screen/slot/Slot index I
 

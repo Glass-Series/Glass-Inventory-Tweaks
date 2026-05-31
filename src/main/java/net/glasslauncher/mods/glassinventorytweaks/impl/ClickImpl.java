@@ -4,6 +4,7 @@ import net.glasslauncher.mods.glassinventorytweaks.api.ShiftClickTreatSeparately
 import net.glasslauncher.mods.glassinventorytweaks.api.ShouldNotShiftClick;
 import net.glasslauncher.mods.glassinventorytweaks.events.init.ShiftClickItemEvent;
 import net.mine_diver.unsafeevents.Event;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -17,12 +18,7 @@ import java.util.List;
 
 public class ClickImpl {
 
-    public static boolean click(int mouseX, int mouseY, int button, HandledScreen handledScreen) {
-        if (button != 0 || !Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-            return false;
-        }
-
-        Slot shiftClickedSlot = handledScreen.getSlotAt(mouseX, mouseY);
+    public static boolean shiftClick(Slot shiftClickedSlot, HandledScreen handledScreen) {
         if (shiftClickedSlot == null || shiftClickedSlot.getStack() == null) {
             return false;
         }
@@ -34,6 +30,7 @@ public class ClickImpl {
         if (shiftClickedSlot.getStack() == null) {
             return true; // Someone emptied the slot, off we go
         }
+        boolean stashedCursorStack = Minecraft.INSTANCE.player.inventory.getCursorStack() != null;
 
         ItemStack stackToMove = shiftClickedSlot.getStack();
 
@@ -97,6 +94,8 @@ public class ClickImpl {
 
         slotGroups.sort(Comparator.comparingInt(e -> -e.priority));
 
+        Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, shiftClickedSlot.id, 0, false, Minecraft.INSTANCE.player);
+
         for (SlotData group : slotGroups) {
             if (originalInv != null && group == originalInv) {
                 continue;
@@ -109,28 +108,24 @@ public class ClickImpl {
                 ItemStack mergeStack = potentialSlot.getStack();
 
                 if (potentialSlot.canInsert(stackToMove) && (mergeStack == null || (mergeStack.isItemEqual(stackToMove) && mergeStack.count < shiftClickedSlot.getMaxItemCount() && mergeStack.count < mergeStack.getItem().getMaxCount()))) {
-                    int maxCount;
-                    if (mergeStack != null) {
-                        maxCount = Math.min(mergeStack.getMaxCount(), potentialSlot.getMaxItemCount()) - mergeStack.count;
-                    }
-                    else {
-                        maxCount = potentialSlot.getMaxItemCount();
-                    }
 
-                    ItemStack toAdd = shiftClickedSlot.takeStack(maxCount);
-                    if (mergeStack != null) {
-                        mergeStack.count += toAdd.count;
-                    }
-                    else {
-                        potentialSlot.setStack(toAdd);
-                    }
+                    Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, potentialSlot.id, 0, false, Minecraft.INSTANCE.player);
 
-                    if (shiftClickedSlot.getStack() == null || shiftClickedSlot.getStack().count < 1) {
-                        shiftClickedSlot.setStack(null);
+                    if (Minecraft.INSTANCE.player.inventory.getCursorStack() == null) {
+                        if (stashedCursorStack) {
+                            Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, shiftClickedSlot.id, 0, false, Minecraft.INSTANCE.player);
+                        }
                         return true;
                     }
                 }
             }
+        }
+        // Put the stack back
+        if (Minecraft.INSTANCE.player.inventory.getCursorStack() != null) {
+            Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, shiftClickedSlot.id, 0, false, Minecraft.INSTANCE.player);
+        }
+        else if (stashedCursorStack) {
+            Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, shiftClickedSlot.id, 0, false, Minecraft.INSTANCE.player);
         }
         return true;
     }

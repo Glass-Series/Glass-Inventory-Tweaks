@@ -10,7 +10,8 @@
   "client": [
     "CraftingInventoryMixin",
     "HandledScreenMixin",
-    "InventoryScreenMixin"
+    "InventoryScreenMixin",
+    "SlotMixin"
   ],
   "injectors": {
     "defaultRequire": 1
