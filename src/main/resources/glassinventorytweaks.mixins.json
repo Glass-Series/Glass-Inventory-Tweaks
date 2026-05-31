@@ -11,6 +11,7 @@
     "CraftingInventoryMixin",
     "HandledScreenMixin",
     "InventoryScreenMixin",
+    "ScreenMixin",
     "SlotMixin"
   ],
   "injectors": {
