@@ -1,6 +1,8 @@
 package net.glasslauncher.mods.glassinventorytweaks.mixin;
 
-import net.glasslauncher.mods.glassinventorytweaks.impl.ClickImpl;
+import net.glasslauncher.mods.glassinventorytweaks.impl.GlassInventoryTweaks;
+import net.glasslauncher.mods.glassinventorytweaks.impl.ModdedClickImpl;
+import net.glasslauncher.mods.glassinventorytweaks.impl.VanillaClickImpl;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.screen.ScreenHandler;
@@ -12,6 +14,8 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import static net.glasslauncher.mods.glassinventorytweaks.impl.ClickType.SHIFT_CLICK;
 
 @Mixin(HandledScreen.class)
 public abstract class HandledScreenMixin extends Screen {
@@ -31,8 +35,7 @@ public abstract class HandledScreenMixin extends Screen {
         if (button != 0 || !Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
             return;
         }
-
-        if (ClickImpl.shiftClick(getSlotAt(mouseX, mouseY), (HandledScreen) (Object) this)) {
+        if (GlassInventoryTweaks.runningWithMod ? ModdedClickImpl.run(SHIFT_CLICK, new Slot[]{getSlotAt(mouseX, mouseY)}, handler) : VanillaClickImpl.shiftClick(getSlotAt(mouseX, mouseY), handler)) {
             ci.cancel();
         }
     }
@@ -47,7 +50,7 @@ public abstract class HandledScreenMixin extends Screen {
     @Inject(method = "render", at = @At("HEAD"))
     private void drag(int mouseX, int mouseY, float delta, CallbackInfo ci) {
         if (mouseDown && Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-            ClickImpl.shiftClick(getSlotAt(mouseX, mouseY), (HandledScreen) (Object) this);
+            VanillaClickImpl.shiftClick(getSlotAt(mouseX, mouseY), handler);
         }
     }
 }

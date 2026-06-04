@@ -1,7 +1,7 @@
 package net.glasslauncher.mods.glassinventorytweaks.mixin;
 
 import net.glasslauncher.mods.glassinventorytweaks.api.ShiftClickTreatSeparately;
-import net.minecraft.client.gui.screen.ingame.InventoryScreen;
+import net.minecraft.screen.PlayerScreenHandler;
 import org.spongepowered.asm.mixin.Mixin;
 
 @ShiftClickTreatSeparately(
@@ -19,6 +19,6 @@ import org.spongepowered.asm.mixin.Mixin;
                 3  // accessoryapi (pray to god this never changes before I add a proper api for this)
         }
 )
-@Mixin(InventoryScreen.class)
-public class InventoryScreenMixin {
+@Mixin(PlayerScreenHandler.class)
+public class PlayerScreenHandlerMixin {
 }

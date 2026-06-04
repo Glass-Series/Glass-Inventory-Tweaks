@@ -16,9 +16,10 @@
   "license": "CC0-1.0",
   "icon": "assets/glassinventorytweaks/icon.png",
 
-  "environment": "client",
+  "environment": "*",
   "entrypoints": {
     "stationapi:event_bus": [
+      "net.glasslauncher.mods.glassinventorytweaks.impl.GlassInventoryTweaks"
     ],
     "stationapi:event_bus_client": [
     ],

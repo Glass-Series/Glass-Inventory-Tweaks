@@ -1,8 +1,8 @@
-package net.glasslauncher.mods.glassinventorytweaks.events.init;
+package net.glasslauncher.mods.glassinventorytweaks.api.event;
 
 import lombok.RequiredArgsConstructor;
 import net.mine_diver.unsafeevents.Event;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
 /**
@@ -11,7 +11,7 @@ import net.minecraft.screen.slot.Slot;
  * NOTE: THE SLOT CONTENTS MAY ALREADY BE NULL FROM ANOTHER EVENT!
  */
 @RequiredArgsConstructor
-public class ShiftClickItemEvent<T extends HandledScreen> extends Event {
+public class ShiftClickItemEvent<T extends ScreenHandler> extends Event {
     public final T screenHandler;
     public final Slot slot;
 }

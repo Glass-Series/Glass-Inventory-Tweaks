@@ -6,3 +6,5 @@ transitive-accessible field net/minecraft/screen/slot/Slot inventory Lnet/minecr
 transitive-accessible field net/minecraft/screen/slot/Slot index I
 
 transitive-accessible method net/minecraft/client/gui/screen/ingame/HandledScreen getSlotAt (II)Lnet/minecraft/screen/slot/Slot;
+
+accessible field net/minecraft/server/network/ServerPlayNetworkHandler player Lnet/minecraft/entity/player/ServerPlayerEntity;

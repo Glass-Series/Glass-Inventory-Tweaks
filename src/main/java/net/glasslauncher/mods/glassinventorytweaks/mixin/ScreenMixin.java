@@ -1,6 +1,6 @@
 package net.glasslauncher.mods.glassinventorytweaks.mixin;
 
-import net.glasslauncher.mods.glassinventorytweaks.impl.ScrollImpl;
+import net.glasslauncher.mods.glassinventorytweaks.impl.VanillaClickImpl;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import org.lwjgl.input.Mouse;
@@ -16,7 +16,7 @@ public class ScreenMixin {
     private void test(CallbackInfo ci) {
         if ((Object) this instanceof HandledScreen handledScreen) {
             float wheel = Mouse.getDWheel();
-            if (wheel != 0 && ScrollImpl.handleScroll(handledScreen, wheel)) {
+            if (wheel != 0 && VanillaClickImpl.handleScroll(handledScreen, wheel)) {
                 ci.cancel();
             }
         }

@@ -4,15 +4,15 @@
   "package": "net.glasslauncher.mods.glassinventorytweaks.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "CraftingInventoryMixin",
+    "PlayerScreenHandlerMixin",
+    "SlotMixin"
   ],
   "server": [
   ],
   "client": [
-    "CraftingInventoryMixin",
     "HandledScreenMixin",
-    "InventoryScreenMixin",
-    "ScreenMixin",
-    "SlotMixin"
+    "ScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
