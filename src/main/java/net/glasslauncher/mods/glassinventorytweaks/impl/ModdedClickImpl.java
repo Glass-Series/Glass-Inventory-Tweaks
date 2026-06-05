@@ -10,18 +10,15 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.modificationstation.stationapi.api.StationAPI;
+import net.modificationstation.stationapi.api.network.packet.PacketHelper;
 
 import java.util.List;
 
 public class ModdedClickImpl {
 
-    public static boolean run(ClickType type, Slot[] clickedSlots, ScreenHandler handler) {
-        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-            switch (type) {
-                case SHIFT_CLICK -> shiftClick(clickedSlots[0], handler);
-            }
-        }
-        return false;
+    public static boolean run(ClickType type, int[] clickedSlots, ScreenHandler handler) {
+        PacketHelper.send(new InventoryTweaksPacket(handler, type, clickedSlots));
+        return true;
     }
 
     public static boolean shiftClick(Slot shiftClickedSlot, ScreenHandler handler) {
@@ -42,11 +39,7 @@ public class ModdedClickImpl {
     }
 
     public static boolean shiftClickStack(Slot shiftClickedSlot, ScreenHandler handler, SlotData originalInv) {
-        ItemStack stackToMove = Minecraft.INSTANCE.player.inventory.getCursorStack();
-
-        if (handler.slots.isEmpty() || stackToMove == null) {
-            return false;
-        }
+        ItemStack stackToMove = shiftClickedSlot.getStack();
 
         List<SlotData> slotGroups = SlotHelper.getSlots(handler);
 

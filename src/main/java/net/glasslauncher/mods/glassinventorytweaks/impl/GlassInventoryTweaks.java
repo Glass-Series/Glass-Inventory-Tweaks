@@ -5,6 +5,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.mine_diver.unsafeevents.listener.EventListener;
 import net.modificationstation.stationapi.api.client.event.network.ServerLoginSuccessEvent;
+import net.modificationstation.stationapi.api.event.network.packet.PacketRegisterEvent;
 import net.modificationstation.stationapi.api.event.world.WorldEvent;
 import net.modificationstation.stationapi.api.network.ModdedPacketHandler;
 import net.modificationstation.stationapi.api.server.event.network.PlayerAttemptLoginEvent;
@@ -24,5 +25,10 @@ public class GlassInventoryTweaks {
         ModdedPacketHandler moddedHandler = ((ModdedPacketHandler) event.clientNetworkHandler);
         runningWithMod = moddedHandler.isModded() && moddedHandler.getMods().containsKey(NAMESPACE.toString());
         LOGGER.info("Joined server {}running {}", runningWithMod ? "" : "not ", NAMESPACE.getName());
+    }
+
+    @EventListener
+    public void packets(PacketRegisterEvent event) {
+        event.register(NAMESPACE.id("inventory"), InventoryTweaksPacket.TYPE);
     }
 }

@@ -35,7 +35,11 @@ public abstract class HandledScreenMixin extends Screen {
         if (button != 0 || !Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
             return;
         }
-        if (GlassInventoryTweaks.runningWithMod ? ModdedClickImpl.run(SHIFT_CLICK, new Slot[]{getSlotAt(mouseX, mouseY)}, handler) : VanillaClickImpl.shiftClick(getSlotAt(mouseX, mouseY), handler)) {
+        Slot slot = getSlotAt(mouseX, mouseY);
+        if (slot == null) {
+            return;
+        }
+        if (GlassInventoryTweaks.runningWithMod ? ModdedClickImpl.run(SHIFT_CLICK, new int[]{slot.id}, handler) : VanillaClickImpl.shiftClick(slot, handler)) {
             ci.cancel();
         }
     }
@@ -49,8 +53,16 @@ public abstract class HandledScreenMixin extends Screen {
 
     @Inject(method = "render", at = @At("HEAD"))
     private void drag(int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        Slot slot = getSlotAt(mouseX, mouseY);
+        if (slot == null) {
+            return;
+        }
         if (mouseDown && Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-            VanillaClickImpl.shiftClick(getSlotAt(mouseX, mouseY), handler);
+            if (GlassInventoryTweaks.runningWithMod) {
+                ModdedClickImpl.run(SHIFT_CLICK, new int[]{slot.id}, handler);
+                return;
+            }
+            VanillaClickImpl.shiftClick(slot, handler);
         }
     }
 }

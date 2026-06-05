@@ -14,13 +14,13 @@ import org.jetbrains.annotations.NotNull;
 import java.io.DataInputStream;
 
 public class InventoryTweaksPacket extends TemplateManagedPacket<InventoryTweaksPacket> {
-    private static final PacketType<InventoryTweaksPacket> TYPE = PacketType.builder(false, true, InventoryTweaksPacket::new).build();
+    public static final PacketType<InventoryTweaksPacket> TYPE = PacketType.builder(false, true, InventoryTweaksPacket::new).build();
 
     private int syncId;
     private ClickType clickType;
     private int[] sourceSlotIndexes;
 
-    public InventoryTweaksPacket(ScreenHandler handler, ClickType clickType, int[] sourceSlotIndexes, int[] targetSlotIndexes) {
+    public InventoryTweaksPacket(ScreenHandler handler, ClickType clickType, int[] sourceSlotIndexes) {
         syncId = handler.syncId;
         this.clickType = clickType;
         this.sourceSlotIndexes = sourceSlotIndexes;
