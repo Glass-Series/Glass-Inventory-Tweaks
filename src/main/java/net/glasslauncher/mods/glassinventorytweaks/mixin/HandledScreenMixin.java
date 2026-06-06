@@ -85,7 +85,7 @@ public abstract class HandledScreenMixin extends Screen {
         if ((button == 1 || button == 0) && minecraft.player.inventory.getCursorStack() != null) {
             mouseDown = button;
             dragStartSlot = slot;
-            ci.cancel();
+            ci.cancel(); // TODO: Uhhh, held item shift click is broken fix this shit dipshit
             return;
         }
         if (button != 0 || !Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
@@ -121,7 +121,7 @@ public abstract class HandledScreenMixin extends Screen {
                     if (GlassInventoryTweaks.runningWithMod) {
                         ModdedClickImpl.run(SPREAD_ONE, hoveredSlots.stream().mapToInt(e -> e.id).toArray(), handler);
                     } else {
-//                    VanillaClickImpl.handleSingleSpread();
+//                        VanillaClickImpl.handleSingleSpread();
                     }
                     hoveredSlots.forEach(e -> ((HighlightableSlot) e).setHighlighted(false));
                     hoveredSlots.clear();
