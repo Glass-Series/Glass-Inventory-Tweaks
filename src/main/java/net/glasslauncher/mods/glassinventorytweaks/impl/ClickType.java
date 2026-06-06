@@ -3,6 +3,7 @@ package net.glasslauncher.mods.glassinventorytweaks.impl;
 public enum ClickType {
     SHIFT_CLICK,
     SCROLL,
-    SPREAD,
+    SPREAD_ONE,
     EVEN_SPREAD,
+    HOTBAR,
 }

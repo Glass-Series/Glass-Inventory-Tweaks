@@ -2,11 +2,14 @@ package net.glasslauncher.mods.glassinventorytweaks.impl;
 
 import lombok.SneakyThrows;
 import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.network.ClientNetworkHandler;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.network.NetworkHandler;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.modificationstation.stationapi.api.network.packet.PacketType;
 import org.jetbrains.annotations.NotNull;
@@ -18,12 +21,12 @@ public class InventoryTweaksPacket extends TemplateManagedPacket<InventoryTweaks
 
     private int syncId;
     private ClickType clickType;
-    private int[] sourceSlotIndexes;
+    private int[] targetSlotIndexes;
 
-    public InventoryTweaksPacket(ScreenHandler handler, ClickType clickType, int[] sourceSlotIndexes) {
+    public InventoryTweaksPacket(ScreenHandler handler, ClickType clickType, int[] targetSlotIndexes) {
         syncId = handler.syncId;
         this.clickType = clickType;
-        this.sourceSlotIndexes = sourceSlotIndexes;
+        this.targetSlotIndexes = targetSlotIndexes;
     }
 
     public InventoryTweaksPacket() {
@@ -40,47 +43,74 @@ public class InventoryTweaksPacket extends TemplateManagedPacket<InventoryTweaks
         syncId = stream.readInt();
         clickType = ClickType.values()[stream.readInt()];
         int indexes = stream.readInt();
-        sourceSlotIndexes = new int[indexes];
+        targetSlotIndexes = new int[indexes];
         for (int i = 0; i < indexes; i++) {
-            sourceSlotIndexes[i] = stream.readInt();
+            targetSlotIndexes[i] = stream.readInt();
         }
     }
 
     @Override
     @SneakyThrows
     public void write(TrackingOutputStream stream) {
+        apply(null); // Only runs on client, server isn't very good at syncing slots, so we yolo it on the client too.
         stream.writeInt(syncId);
         stream.writeInt(clickType.ordinal());
-        stream.writeInt(sourceSlotIndexes.length);
-        for (int sourceSlotIndex : sourceSlotIndexes) {
+        stream.writeInt(targetSlotIndexes.length);
+        for (int sourceSlotIndex : targetSlotIndexes) {
             stream.writeInt(sourceSlotIndex);
         }
     }
 
     @Override
     public void apply(NetworkHandler networkHandler) {
+        ScreenHandler handler;
+        ItemStack cursorStack;
+        PlayerEntity player;
+
+        if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER) {
+            player = getPlayer(networkHandler, syncId);
+            if (player == null) {
+                return;
+            }
+        }
+        else if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
+            player = getPlayerClient();
+        }
+        else {
+            return; // Something invalid happened
+        }
+
+        handler = player.currentScreenHandler;
+        cursorStack = player.inventory.getCursorStack();
+
         switch (clickType) {
             case SHIFT_CLICK -> {
-                ScreenHandler handler;
-                if (FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER && networkHandler instanceof ServerPlayNetworkHandler serverPlayNetworkHandler) {
-                    if (serverPlayNetworkHandler.player.currentScreenHandler.syncId != syncId) {
-                        return;
-                    }
-                    handler = serverPlayNetworkHandler.player.currentScreenHandler;
-                }
-                else if (FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT) {
-                    handler = Minecraft.INSTANCE.player.currentScreenHandler;
-                }
-                else {
-                    return; // Something invalid happened
-                }
-                for (int slot : sourceSlotIndexes) {
+                for (int slot : targetSlotIndexes) {
                     ModdedClickImpl.shiftClick(handler.getSlot(slot), handler);
                 }
             }
             case SCROLL -> {
-                break;
+                for (int slotId : targetSlotIndexes) {
+                    Slot slot = handler.getSlot(slotId);
+                    ModdedClickImpl.shiftClick(slot, handler, 1);
+                }
             }
+            case SPREAD_ONE -> ModdedClickImpl.spreadSingle(cursorStack, targetSlotIndexes, handler, player);
+            case EVEN_SPREAD -> ModdedClickImpl.spreadEven(cursorStack, targetSlotIndexes, handler, player);
+            case HOTBAR -> ModdedClickImpl.handleHotbar(targetSlotIndexes, handler, player);
         }
+    }
+
+    @Environment(EnvType.SERVER)
+    private static PlayerEntity getPlayer(NetworkHandler networkHandler, int syncId) {
+        if (((ServerPlayNetworkHandler) networkHandler).player.currentScreenHandler.syncId != syncId) {
+            return null;
+        }
+        return ((ServerPlayNetworkHandler) networkHandler).player;
+    }
+
+    @Environment(EnvType.CLIENT)
+    private static PlayerEntity getPlayerClient() {
+        return Minecraft.INSTANCE.player;
     }
 }
