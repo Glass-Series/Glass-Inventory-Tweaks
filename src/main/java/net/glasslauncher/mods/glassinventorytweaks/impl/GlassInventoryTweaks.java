@@ -4,6 +4,8 @@ import com.google.gson.GsonBuilder;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.mine_diver.unsafeevents.listener.EventListener;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.ConnectScreen;
 import net.modificationstation.stationapi.api.client.event.network.ServerLoginSuccessEvent;
 import net.modificationstation.stationapi.api.event.network.packet.PacketRegisterEvent;
 import net.modificationstation.stationapi.api.event.world.WorldEvent;
@@ -30,7 +32,7 @@ public class GlassInventoryTweaks {
     @Environment(EnvType.CLIENT)
     @EventListener
     public void onSingleplayer(WorldEvent.Init event) {
-        if (!event.world.isRemote) {
+        if (!(Minecraft.INSTANCE.currentScreen instanceof ConnectScreen)) {
             GlassInventoryTweaks.runningWithMod = true;
         }
     }
