@@ -118,6 +118,11 @@ public abstract class HandledScreenMixin extends Screen {
                     hoveredSlots.clear();
                 }
                 case 1 -> {
+                    if (hoveredSlots.isEmpty()) {
+                        skip = true;
+                        mouseClicked(mouseX, mouseY, button);
+                        skip = false;
+                    }
                     if (GlassInventoryTweaks.runningWithMod) {
                         ModdedClickImpl.run(SPREAD_ONE, hoveredSlots.stream().mapToInt(e -> e.id).toArray(), handler);
                     } else {
@@ -164,7 +169,7 @@ public abstract class HandledScreenMixin extends Screen {
                 }
             }
             case 1 -> {
-                if (minecraft.player.inventory.getCursorStack() != null && hoveredSlots.size() < minecraft.player.inventory.getCursorStack().count) {
+                if (minecraft.player.inventory.getCursorStack() != null && hoveredSlots.size() < minecraft.player.inventory.getCursorStack().count && slot != dragStartSlot) {
                     if (StackUtil.canMerge(slot, minecraft.player.inventory.getCursorStack())) {
                         if (dragStartSlot != null) {
                             hoveredSlots.add(dragStartSlot);
