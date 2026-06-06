@@ -27,6 +27,14 @@ public class GlassInventoryTweaks {
         LOGGER.info("Joined server {}running {}", runningWithMod ? "" : "not ", NAMESPACE.getName());
     }
 
+    @Environment(EnvType.CLIENT)
+    @EventListener
+    public void onSingleplayer(WorldEvent.Init event) {
+        if (!event.world.isRemote) {
+            GlassInventoryTweaks.runningWithMod = true;
+        }
+    }
+
     @EventListener
     public void packets(PacketRegisterEvent event) {
         event.register(NAMESPACE.id("inventory"), InventoryTweaksPacket.TYPE);
