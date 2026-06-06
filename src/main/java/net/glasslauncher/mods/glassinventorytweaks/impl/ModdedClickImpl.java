@@ -158,6 +158,9 @@ public class ModdedClickImpl {
             return false;
         }
         int divisionCount = (int) Math.floor(cursorStack.count / (float) slots.length);
+        if (divisionCount == 0) {
+            return false;
+        }
         int diff;
         for (int slotId : slots) {
             if (cursorStack.count <= 0) {
