@@ -158,6 +158,7 @@ public abstract class HandledScreenMixin extends Screen {
                 }
                 else if (minecraft.player.inventory.getCursorStack() != null && hoveredSlots.size() < minecraft.player.inventory.getCursorStack().count && slot != dragStartSlot) {
                     if (StackUtil.canMerge(slot, minecraft.player.inventory.getCursorStack())) {
+                else if (GlassInventoryTweaks.runningWithMod && minecraft.player.inventory.getCursorStack() != null && hoveredSlots.size() < minecraft.player.inventory.getCursorStack().count && slot != dragStartSlot) {
                         if (dragStartSlot != null) {
                             hoveredSlots.add(dragStartSlot);
                             ((HighlightableSlot) dragStartSlot).setHighlighted(true);
