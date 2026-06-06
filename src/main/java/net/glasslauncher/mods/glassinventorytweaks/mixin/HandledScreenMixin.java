@@ -208,11 +208,15 @@ public abstract class HandledScreenMixin extends Screen {
 
     @Inject(method = "render", at = @At("HEAD"))
     private void makePreviewStack(int mouseX, int mouseY, float delta, CallbackInfo ci) {
+        previewStack = null;
         if (hoveredSlots.isEmpty()) {
             return;
         }
 
         ItemStack cursorStack = minecraft.player.inventory.getCursorStack();
+        if (cursorStack == null) {
+            return;
+        }
         int count;
         switch (mouseDown) {
             case 0:
