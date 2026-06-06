@@ -156,9 +156,8 @@ public abstract class HandledScreenMixin extends Screen {
                     }
                     VanillaClickImpl.shiftClick(slot, handler);
                 }
-                else if (minecraft.player.inventory.getCursorStack() != null && hoveredSlots.size() < minecraft.player.inventory.getCursorStack().count && slot != dragStartSlot) {
-                    if (StackUtil.canMerge(slot, minecraft.player.inventory.getCursorStack())) {
                 else if (GlassInventoryTweaks.runningWithMod && minecraft.player.inventory.getCursorStack() != null && hoveredSlots.size() < minecraft.player.inventory.getCursorStack().count && slot != dragStartSlot) {
+                    if (minecraft.player.inventory.getCursorStack().count > 1 && StackUtil.canMerge(slot, minecraft.player.inventory.getCursorStack())) {
                         if (dragStartSlot != null) {
                             hoveredSlots.add(dragStartSlot);
                             ((HighlightableSlot) dragStartSlot).setHighlighted(true);
@@ -171,7 +170,7 @@ public abstract class HandledScreenMixin extends Screen {
             }
             case 1 -> {
                 if (minecraft.player.inventory.getCursorStack() != null && hoveredSlots.size() < minecraft.player.inventory.getCursorStack().count && slot != dragStartSlot) {
-                    if (StackUtil.canMerge(slot, minecraft.player.inventory.getCursorStack())) {
+                    if (minecraft.player.inventory.getCursorStack().count > 1 && StackUtil.canMerge(slot, minecraft.player.inventory.getCursorStack())) {
                         if (dragStartSlot != null) {
                             hoveredSlots.add(dragStartSlot);
                             ((HighlightableSlot) dragStartSlot).setHighlighted(true);
