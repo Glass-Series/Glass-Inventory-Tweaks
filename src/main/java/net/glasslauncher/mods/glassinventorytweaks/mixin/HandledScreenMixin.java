@@ -149,7 +149,7 @@ public abstract class HandledScreenMixin extends Screen {
         }
         switch (mouseDown) {
             case 0 -> {
-                if (minecraft.player.inventory.getCursorStack() == null && Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+                if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
                     if (GlassInventoryTweaks.runningWithMod) {
                         ModdedClickImpl.run(SHIFT_CLICK, new int[]{slot.id}, handler);
                         return;
