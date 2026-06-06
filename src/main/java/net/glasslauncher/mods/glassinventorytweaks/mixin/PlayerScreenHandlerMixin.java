@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.Mixin;
                 0, // craftoutput
                 0, // craftinput
                 4, // armor
-                1, // main
-                2, // hotbar
+                2, // main
+                1, // hotbar
                 3  // accessoryapi (pray to god this never changes before I add a proper api for this)
         }
 )
