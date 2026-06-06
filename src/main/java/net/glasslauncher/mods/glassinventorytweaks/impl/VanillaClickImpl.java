@@ -12,6 +12,7 @@ import net.modificationstation.stationapi.api.StationAPI;
 import org.lwjgl.input.Mouse;
 
 import java.util.List;
+import java.util.Set;
 
 public class VanillaClickImpl {
 
@@ -106,6 +107,19 @@ public class VanillaClickImpl {
             Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, shiftClickedSlot.id, 0, false, Minecraft.INSTANCE.player);
             Minecraft.INSTANCE.interactionManager.clickSlot(handledScreen.handler.syncId, holdMyStackASec.id, 0, false, Minecraft.INSTANCE.player);
             VanillaClickImpl.shiftClickCursorStack(handledScreen.handler, originalInv);
+        }
+        return true;
+    }
+
+    public static boolean handleSingleSpread(Set<Slot> hoveredSlots, ScreenHandler handler) {
+        ItemStack cursorStack = Minecraft.INSTANCE.player.inventory.getCursorStack();
+        if (cursorStack == null) {
+            return false;
+        }
+        for (Slot slot : hoveredSlots) {
+            if (StackUtil.canMerge(slot, cursorStack)) {
+                Minecraft.INSTANCE.interactionManager.clickSlot(handler.syncId, slot.id, 1, false, Minecraft.INSTANCE.player);
+            }
         }
         return true;
     }

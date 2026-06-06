@@ -126,7 +126,7 @@ public abstract class HandledScreenMixin extends Screen {
                     if (GlassInventoryTweaks.runningWithMod) {
                         ModdedClickImpl.run(SPREAD_ONE, hoveredSlots.stream().mapToInt(e -> e.id).toArray(), handler);
                     } else {
-//                        VanillaClickImpl.handleSingleSpread();
+                        VanillaClickImpl.handleSingleSpread(hoveredSlots, handler);
                     }
                     hoveredSlots.forEach(e -> ((HighlightableSlot) e).setHighlighted(false));
                     hoveredSlots.clear();
