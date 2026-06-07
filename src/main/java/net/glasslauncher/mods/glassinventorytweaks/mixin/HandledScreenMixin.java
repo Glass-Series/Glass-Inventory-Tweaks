@@ -22,6 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import static net.glasslauncher.mods.glassinventorytweaks.impl.ClickType.*;
@@ -64,7 +65,7 @@ public abstract class HandledScreenMixin extends Screen {
             return;
         }
 
-        if (ModdedClickImpl.run(ClickType.HOTBAR, new int[]{keyCode - 2, slot.id}, handler)) {
+        if (GlassInventoryTweaks.runningWithMod && ModdedClickImpl.run(ClickType.HOTBAR, new int[]{keyCode - 2, slot.id}, handler)) {
             ci.cancel();
         }
     }
